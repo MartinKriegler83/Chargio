@@ -125,15 +125,15 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
       <span style="font-size:12px;color:rgba(32,30,29,.55)">{{ deltaLabel }}</span>
     </div>
     <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
-      <span class="cmyk-num" style="font-size:78px;font-weight:700;letter-spacing:-0.03em;animation:tick .28s ease-out">
-        <span class="paper">{{ timeStr }}</span>
-        <span class="plate plate-c" aria-hidden="true">{{ timeStr }}</span>
-        <span class="plate plate-m" aria-hidden="true">{{ timeStr }}</span>
-        <span class="plate plate-y" aria-hidden="true">{{ timeStr }}</span>
+      <span class="cmyk-num" style="position:relative;display:block;width:fit-content;font-size:78px;font-weight:700;letter-spacing:-0.03em;line-height:0.9;background:#f3f2f2;padding:0.12em;margin:-0.12em;animation:tick .28s ease-out">
+        <span class="paper" style="color:#f3f2f2;text-shadow:0.036em 0.025em 0 #f3f2f2,-0.031em -0.023em 0 #f3f2f2">{{ timeStr }}</span>
+        <span class="plate plate-c" aria-hidden="true" style="position:absolute;inset:0.12em;line-height:0.9;mix-blend-mode:multiply;color:#0088b0">{{ timeStr }}</span>
+        <span class="plate plate-m" aria-hidden="true" style="position:absolute;inset:0.12em;line-height:0.9;mix-blend-mode:multiply;color:#d6006c;translate:0.036em 0.025em">{{ timeStr }}</span>
+        <span class="plate plate-y" aria-hidden="true" style="position:absolute;inset:0.12em;line-height:0.9;mix-blend-mode:multiply;color:#edbb00;translate:-0.031em -0.023em">{{ timeStr }}</span>
       </span>
       <span style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55);padding-bottom:9px">Std&#8202;:&#8202;Min</span>
     </div>
-    <dl style="margin:0;display:grid;grid-template-columns:1fr 1fr;gap:12px 14px">
+    <dl style="margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px 12px">
       <div style="display:flex;flex-direction:column;gap:2px">
         <dt style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Energie</dt>
         <dd style="margin:0;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">{{ kwhLabel }} kWh</dd>
@@ -141,6 +141,10 @@ input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appear
       <div style="display:flex;flex-direction:column;gap:2px">
         <dt style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Fertig um</dt>
         <dd style="margin:0;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">{{ readyAt }}</dd>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <dt style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Reichweite</dt>
+        <dd style="margin:0;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">{{ rangeLabel }} km</dd>
       </div>
     </dl>
   </section>
@@ -151,8 +155,8 @@ class Component extends DCLogic {
   constructor(p){
     super(p);
     const CARS = [
-      { id: 'atto3', name: 'Atto 3 Evo', cap: 75, dotBg: '#0088b0' },
-      { id: 'sealu', name: 'Seal U', cap: 87, dotBg: '#d6006c' }
+      { id: 'atto3', name: 'Atto 3 Evo', cap: 75, cons: 18, dotBg: '#0088b0' },
+      { id: 'sealu', name: 'Seal U', cap: 87, cons: 22, dotBg: '#d6006c' }
     ];
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem('ladezeit.v1') || '{}'); } catch (e) {}
@@ -262,6 +266,8 @@ class Component extends DCLogic {
       },
       timeStr: h + ':' + String(m).padStart(2, '0'),
       kwhLabel: this.fmt(kwh, 1),
+      consLabel: this.fmt(car.cons, 0),
+      rangeLabel: this.fmt(Math.round(Math.max(0, (s.target - 12) / 100 * car.cap / car.cons * 100)), 0),
       deltaLabel: s.target > s.current
         ? s.current + ' % \u2192 ' + s.target + ' % \u00b7 ' + car.name
         : 'Ziel erreicht \u00b7 ' + car.name,
