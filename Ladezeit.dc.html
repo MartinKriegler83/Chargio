@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chargio">
+<meta name="theme-color" content="#f3f2f2">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="_ds/broadsheet-fb835537-eebe-4343-9cce-a34ee460fde5/styles.css">
+<script src="_ds/broadsheet-fb835537-eebe-4343-9cce-a34ee460fde5/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#f3f2f2;color:#201e1d;-webkit-text-size-adjust:100%;overscroll-behavior:none}
+body{font-family:"Source Serif 4",Georgia,serif}
+*{-webkit-tap-highlight-color:transparent}
+a{color:#0088b0}a:hover{color:#006786}
+input[type=number]{-moz-appearance:textfield}
+input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+@keyframes tick{from{opacity:.35}to{opacity:1}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:calc(env(safe-area-inset-top) + 18px) 20px calc(env(safe-area-inset-bottom) + 28px);max-width:520px;margin:0 auto;box-sizing:border-box;display:flex;flex-direction:column;gap:22px;touch-action:manipulation">
+
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <div style="display:flex;align-items:center;gap:11px">
+      <svg width="34" height="34" viewBox="0 0 40 40" aria-hidden="true" style="display:block;overflow:visible">
+        <g style="mix-blend-mode:multiply">
+          <path d="M23.5 2 8 23h9.5L15 38 32 16h-10.5z" fill="#0088b0"></path>
+          <path d="M23.5 2 8 23h9.5L15 38 32 16h-10.5z" fill="#d6006c" transform="translate(1.5 1.1)"></path>
+          <path d="M23.5 2 8 23h9.5L15 38 32 16h-10.5z" fill="#edbb00" transform="translate(-1.2 -0.9)"></path>
+        </g>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:1px">
+        <span style="font-size:27px;font-weight:700;letter-spacing:-0.02em;line-height:1">{{ appName }}</span>
+        <span style="font-size:10.5px;letter-spacing:0.16em;text-transform:uppercase;color:#0088b0">Ladezeit&#8209;Rechner</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2.5px">
+      <div style="height:3px;background:#201e1d"></div>
+      <div style="height:1px;background:#201e1d"></div>
+    </div>
+  </header>
+
+  <section style="display:flex;flex-direction:column;gap:9px">
+    <h6 style="margin:0;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Fahrzeug</h6>
+    <div style="display:flex;gap:9px">
+      <sc-for list="{{ cars }}" as="car" hint-placeholder-count="2">
+        <label style="{{ car.cardStyle }}">
+          <input type="radio" name="car" value="{{ car.id }}" checked="{{ car.checked }}" onChange="{{ car.onPick }}" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0">
+          <span style="display:flex;align-items:center;gap:7px">
+            <span style="width:9px;height:9px;border-radius:50%;flex:none;background:{{ car.dotBg }};box-shadow:inset 0 0 0 1px rgba(32,30,29,.3)"></span>
+            <span style="font-size:16px;font-weight:600;line-height:1.1">{{ car.name }}</span>
+          </span>
+          <span style="font-size:12px;color:rgba(32,30,29,.55);padding-left:16px">{{ car.capLabel }} kWh</span>
+        </label>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:14px">
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <h6 style="margin:0;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Aktueller Akkustand</h6>
+        <span style="font-size:19px;font-weight:600;font-variant-numeric:tabular-nums">{{ current }}&#8202;%</span>
+      </div>
+      <div ref="{{ curTrack }}" onPointerDown="{{ curDown }}" onPointerMove="{{ curMove }}" style="position:relative;height:38px;display:flex;align-items:center;cursor:pointer;touch-action:none">
+        <div style="position:absolute;left:0;right:0;height:10px;background:#eae9e9;border:1px solid rgba(32,30,29,.16);border-radius:2px;box-sizing:border-box"></div>
+        <div style="{{ curFill }}"></div>
+        <div style="{{ curKnob }}"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <h6 style="margin:0;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Ziel&#8209;Ladestand</h6>
+        <span style="font-size:19px;font-weight:600;font-variant-numeric:tabular-nums">{{ target }}&#8202;%</span>
+      </div>
+      <div ref="{{ tgtTrack }}" onPointerDown="{{ tgtDown }}" onPointerMove="{{ tgtMove }}" style="position:relative;height:38px;display:flex;align-items:center;cursor:pointer;touch-action:none">
+        <div style="position:absolute;left:0;right:0;height:10px;background:#eae9e9;border:1px solid rgba(32,30,29,.16);border-radius:2px;box-sizing:border-box"></div>
+        <div style="{{ tgtFill }}"></div>
+        <div style="{{ tgtKnob }}"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <sc-for list="{{ targetPresets }}" as="p" hint-placeholder-count="3">
+          <button type="button" onClick="{{ p.onPick }}" style="{{ p.style }}">{{ p.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <h6 style="margin:0;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Ladeleistung</h6>
+      <div style="display:flex;align-items:center;gap:10px">
+        <input type="number" inputmode="decimal" step="0.1" min="0.5" value="{{ power }}" onChange="{{ onPower }}" onInput="{{ onPower }}" style="width:118px;min-height:46px;box-sizing:border-box;padding:6px 11px;font:600 22px/1 'Source Serif 4',Georgia,serif;font-variant-numeric:tabular-nums;color:#201e1d;background:#eae9e9;border:1px solid rgba(32,30,29,.16);border-radius:2px;caret-color:#0088b0">
+        <span style="font-size:15px;color:rgba(32,30,29,.6)">kW</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <sc-for list="{{ powerPresets }}" as="p" hint-placeholder-count="8">
+          <button type="button" onClick="{{ p.onPick }}" style="{{ p.style }}">{{ p.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:12px;padding-top:4px">
+    <div style="display:flex;flex-direction:column;gap:2.5px">
+      <div style="height:1px;background:#201e1d"></div>
+      <div style="height:3px;background:#201e1d"></div>
+    </div>
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+      <h6 style="margin:0;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#d6006c">Ladedauer</h6>
+      <span style="font-size:12px;color:rgba(32,30,29,.55)">{{ deltaLabel }}</span>
+    </div>
+    <div style="display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap">
+      <span class="cmyk-num" style="font-size:78px;font-weight:700;letter-spacing:-0.03em;animation:tick .28s ease-out">
+        <span class="paper">{{ timeStr }}</span>
+        <span class="plate plate-c" aria-hidden="true">{{ timeStr }}</span>
+        <span class="plate plate-m" aria-hidden="true">{{ timeStr }}</span>
+        <span class="plate plate-y" aria-hidden="true">{{ timeStr }}</span>
+      </span>
+      <span style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55);padding-bottom:9px">Std&#8202;:&#8202;Min</span>
+    </div>
+    <dl style="margin:0;display:grid;grid-template-columns:1fr 1fr;gap:12px 14px">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <dt style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Energie</dt>
+        <dd style="margin:0;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">{{ kwhLabel }} kWh</dd>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <dt style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(32,30,29,.55)">Fertig um</dt>
+        <dd style="margin:0;font-size:20px;font-weight:600;font-variant-numeric:tabular-nums">{{ readyAt }}</dd>
+      </div>
+    </dl>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:430,&quot;height&quot;:932},&quot;appName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Chargio&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  constructor(p){
+    super(p);
+    const CARS = [
+      { id: 'atto3', name: 'Atto 3 Evo', cap: 75, dotBg: '#0088b0' },
+      { id: 'sealu', name: 'Seal U', cap: 87, dotBg: '#d6006c' }
+    ];
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('ladezeit.v1') || '{}'); } catch (e) {}
+    this.CARS = CARS;
+    this.state = {
+      carId: saved.carId || CARS[0].id,
+      current: typeof saved.current === 'number' ? saved.current : 32,
+      target: typeof saved.target === 'number' ? saved.target : 80,
+      power: typeof saved.power === 'number' ? saved.power : 11,
+      lossOn: saved.lossOn !== false
+    };
+    this.curTrack = React.createRef();
+    this.tgtTrack = React.createRef();
+    this.LOSS = 0.08;
+  }
+  persist(next){
+    this.setState(next, () => {
+      try { localStorage.setItem('ladezeit.v1', JSON.stringify(this.state)); } catch (e) {}
+    });
+  }
+  pctFrom(ref, e){
+    const el = ref.current; if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return Math.round(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * 100);
+  }
+  dragCur(e){
+    const v = this.pctFrom(this.curTrack, e); if (v === null) return;
+    this.persist({ current: v, target: Math.max(this.state.target, v) });
+  }
+  dragTgt(e){
+    const v = this.pctFrom(this.tgtTrack, e); if (v === null) return;
+    this.persist({ target: v, current: Math.min(this.state.current, v) });
+  }
+  fmt(n, d){ return n.toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d }); }
+  renderVals(){
+    const s = this.state;
+    const car = this.CARS.find(c => c.id === s.carId) || this.CARS[0];
+    const power = s.power > 0 ? s.power : 0;
+    const kwh = Math.max(0, (s.target - s.current) / 100 * car.cap);
+    const hoursRaw = power > 0 ? kwh / power : 0;
+    const total = Math.round(hoursRaw * 60);
+    const h = Math.floor(total / 60), m = total % 60;
+    const ready = new Date(Date.now() + total * 60000);
+    const bar = (pct, color) => ({
+      position: 'absolute', left: 0, height: '10px', width: pct + '%',
+      background: color, borderRadius: '2px', pointerEvents: 'none'
+    });
+    const knob = (pct, color) => ({
+      position: 'absolute', left: 'calc(' + pct + '% - 13px)', width: '26px', height: '26px',
+      background: '#f3f2f2', border: '2px solid ' + color, borderRadius: '50%',
+      boxShadow: '0 1px 4px rgba(32,30,29,.22)', pointerEvents: 'none'
+    });
+    return {
+      appName: this.props.appName ?? 'Chargio',
+      cars: this.CARS.map(c => ({
+        ...c,
+        capLabel: String(c.cap),
+        checked: c.id === s.carId,
+        cardStyle: {
+          flex: '1 1 0', minWidth: 0, display: 'flex', flexDirection: 'column', gap: '3px',
+          padding: '12px 13px', borderRadius: '2px', cursor: 'pointer',
+          border: c.id === s.carId ? '2px solid #0088b0' : '1px solid rgba(32,30,29,.16)',
+          margin: c.id === s.carId ? 0 : '1px',
+          background: c.id === s.carId ? '#e9f8ff' : 'transparent'
+        },
+        onPick: () => this.persist({ carId: c.id })
+      })),
+      current: s.current,
+      target: s.target,
+      power: s.power,
+      curTrack: this.curTrack,
+      tgtTrack: this.tgtTrack,
+      curFill: bar(s.current, '#201e1d'),
+      curKnob: knob(s.current, '#201e1d'),
+      tgtFill: bar(s.target, '#0088b0'),
+      tgtKnob: knob(s.target, '#0088b0'),
+      curDown: e => { e.currentTarget.setPointerCapture(e.pointerId); this.dragCur(e); },
+      curMove: e => { if (e.buttons || e.pointerType === 'touch') this.dragCur(e); },
+      tgtDown: e => { e.currentTarget.setPointerCapture(e.pointerId); this.dragTgt(e); },
+      tgtMove: e => { if (e.buttons || e.pointerType === 'touch') this.dragTgt(e); },
+      targetPresets: [60, 70, 80, 100].map(v => ({
+        label: v + ' %',
+        style: {
+          flex: '1 1 0', padding: '9px 0', font: "600 14px/1 'Source Serif 4',Georgia,serif",
+          borderRadius: '2px', cursor: 'pointer',
+          color: v === s.target ? '#f3f2f2' : '#201e1d',
+          background: v === s.target ? '#0088b0' : 'transparent',
+          border: v === s.target ? '1px solid #0088b0' : '1px solid rgba(32,30,29,.16)'
+        },
+        onPick: () => this.persist({ target: v, current: Math.min(s.current, v) })
+      })),
+      powerPresets: [4, 6, 8, 10].map(v => ({
+        label: this.fmt(v, v % 1 ? 1 : 0),
+        style: {
+          padding: '10px 0', font: "400 14px/1 'Source Serif 4',Georgia,serif",
+          fontVariantNumeric: 'tabular-nums', borderRadius: '2px', cursor: 'pointer',
+          fontWeight: v === s.power ? 600 : 400,
+          color: v === s.power ? '#f3f2f2' : '#201e1d',
+          background: v === s.power ? '#0088b0' : 'transparent',
+          border: v === s.power ? '1px solid #0088b0' : '1px solid rgba(32,30,29,.16)'
+        },
+        onPick: () => this.persist({ power: v })
+      })),
+      onPower: e => {
+        const v = parseFloat(String(e.target.value).replace(',', '.'));
+        this.persist({ power: isNaN(v) ? 0 : Math.min(400, Math.max(0, v)) });
+      },
+      timeStr: h + ':' + String(m).padStart(2, '0'),
+      kwhLabel: this.fmt(kwh, 1),
+      deltaLabel: s.target > s.current
+        ? s.current + ' % \u2192 ' + s.target + ' % \u00b7 ' + car.name
+        : 'Ziel erreicht \u00b7 ' + car.name,
+      readyAt: total > 0 ? ready.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' }) : '\u2014'
+    };
+  }
+}
+</script>
+</body>
+</html>
